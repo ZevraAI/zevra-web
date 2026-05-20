@@ -3,10 +3,16 @@ import { motion } from 'framer-motion';
 import { ArrowRight, Play, ShieldCheck, Zap, Globe } from 'lucide-react';
 import ChatDemo from './ChatDemo';
 
+const INDUSTRIES = [
+  'Healthcare', 'Hospitality', 'Logistics', 'Financial Services',
+  'Retail', 'Manufacturing', 'Real Estate', 'Energy',
+  'Pharma', 'Education', 'Insurance', 'Government',
+];
+
 const proof = [
   { icon: ShieldCheck, label: 'Read-only · Fully audited' },
-  { icon: Zap, label: 'Live in under a day' },
-  { icon: Globe, label: 'Any industry · Any database' },
+  { icon: Zap,         label: 'Live in under a day' },
+  { icon: Globe,       label: 'Any industry · Any database' },
 ];
 
 const fadeUp = (delay = 0) => ({
@@ -17,8 +23,8 @@ const fadeUp = (delay = 0) => ({
 
 export default function Hero() {
   return (
-    <section className="relative min-h-screen flex items-center pt-16 overflow-hidden">
-      {/* Background */}
+    <section className="relative flex flex-col pt-16 overflow-hidden bg-[#080A0F]">
+      {/* Background orbs + grid */}
       <div className="absolute inset-0 grid-bg pointer-events-none" />
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute -top-32 -left-32 w-[700px] h-[700px] rounded-full bg-emerald-brand/20 blur-[120px] opacity-60" />
@@ -26,7 +32,8 @@ export default function Hero() {
         <div className="absolute bottom-0 left-1/3 w-[400px] h-[400px] rounded-full bg-emerald-900/20 blur-[80px] opacity-40" />
       </div>
 
-      <div className="container-pad w-full relative z-10 py-20 lg:py-28">
+      {/* ── Main hero content ── */}
+      <div className="container-pad w-full relative z-10 pt-16 pb-14 lg:pt-20 lg:pb-16">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
           {/* Left — copy */}
           <div>
@@ -56,7 +63,7 @@ export default function Hero() {
               <span className="text-zinc-200 font-medium">for any industry, any team.</span>
             </motion.p>
 
-            <motion.div {...fadeUp(0.22)} className="flex flex-wrap gap-3 mb-14">
+            <motion.div {...fadeUp(0.22)} className="flex flex-wrap gap-3 mb-12">
               <Link
                 to="/demo"
                 className="inline-flex items-center gap-2 px-6 py-3.5 bg-emerald-500 hover:bg-emerald-400 text-white font-semibold text-[15px] rounded-xl transition-all shadow-xl shadow-emerald-900/40 hover:shadow-emerald-900/60 hover:-translate-y-0.5"
@@ -94,6 +101,29 @@ export default function Hero() {
           </motion.div>
         </div>
       </div>
+
+      {/* ── Industry trust bar — part of the hero, always visible on load ── */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.6, delay: 0.5 }}
+        className="relative z-10 border-t border-white/[0.07] bg-white/[0.02] py-5 overflow-hidden"
+      >
+        <p className="text-center text-[10.5px] font-semibold tracking-[0.12em] uppercase text-zinc-600 mb-4">
+          Built for every industry
+        </p>
+        <div className="overflow-hidden flex">
+          {/* Double the list for seamless loop */}
+          <div className="flex animate-marquee shrink-0">
+            {[...INDUSTRIES, ...INDUSTRIES].map((name, i) => (
+              <div key={i} className="flex items-center gap-3 px-8 shrink-0">
+                <span className="w-1 h-1 rounded-full bg-emerald-500/50 shrink-0" />
+                <span className="text-[13px] font-medium text-zinc-500 whitespace-nowrap">{name}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </motion.div>
     </section>
   );
 }
