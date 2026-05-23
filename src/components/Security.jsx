@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
-import { ShieldCheck, Lock, Eye, FileText } from 'lucide-react';
+import { ShieldCheck, Lock, Eye, FileText, EyeOff, Key } from 'lucide-react';
 
 const ITEMS = [
   {
@@ -14,9 +14,19 @@ const ITEMS = [
     desc: 'Every customer\'s data is isolated in its own schema. There is no shared database, no cross-tenant queries, no risk of data bleed.',
   },
   {
+    icon: EyeOff,
+    title: 'Column-level masking',
+    desc: 'Sensitive columns — emails, SSNs, card numbers — are masked, hashed, partially redacted, or excluded entirely before results reach the user. PII never crosses the boundary.',
+  },
+  {
+    icon: Key,
+    title: 'Row-level security',
+    desc: 'Users see only the rows they\'re authorised to access. RLS policies resolve each user\'s attributes at query time — no separate query or application-layer filtering needed.',
+  },
+  {
     icon: FileText,
     title: 'Complete query audit trail',
-    desc: 'Every query Zevra runs is logged with the user, timestamp, question asked, and SQL executed. Full visibility, always.',
+    desc: 'Every query Zevra runs is logged with the user, timestamp, question asked, SQL executed, and which columns were masked or filtered. Full visibility, always.',
   },
   {
     icon: ShieldCheck,
@@ -40,24 +50,24 @@ export default function Security() {
           className="text-center max-w-2xl mx-auto mb-14"
         >
           <span className="inline-flex items-center gap-2 text-xs font-semibold tracking-widest uppercase text-emerald-700 mb-5 before:content-[''] before:inline-block before:w-5 before:h-0.5 before:bg-emerald-700 before:rounded-full">
-            Security & Trust
+            Security & Governance
           </span>
           <h2 className="text-[38px] lg:text-[48px] font-black tracking-tight leading-[1.06] text-gray-900 mb-4">
-            Enterprise-grade security.<br />Zero compromises.
+            Enterprise-grade security<br />and governance.
           </h2>
           <p className="text-[17px] text-gray-500 leading-relaxed">
-            We built Zevra to pass enterprise security reviews.
-            Because we know that's the first question your IT team will ask.
+            We built Zevra to pass enterprise security reviews —
+            and to give compliance teams the controls they actually need.
           </p>
         </motion.div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {ITEMS.map((item, i) => (
             <motion.div
               key={item.title}
               initial={{ opacity: 0, y: 24 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.5, delay: i * 0.1 }}
+              transition={{ duration: 0.5, delay: i * 0.08 }}
               className="bg-white border-[1.5px] border-gray-100 rounded-2xl p-6 text-center hover:border-emerald-200 hover:shadow-lg hover:shadow-emerald-50 transition-all"
             >
               <div className="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center mx-auto mb-4">

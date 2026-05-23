@@ -5,6 +5,7 @@ const CASES = [
   {
     emoji: '🏥',
     industry: 'Healthcare',
+    pack: 'Healthcare Pack',
     desc: 'Operational intelligence for patient flow, billing, staffing, and compliance.',
     questions: [
       'Which wards have the longest average discharge time this week?',
@@ -15,6 +16,7 @@ const CASES = [
   {
     emoji: '🏨',
     industry: 'Hospitality',
+    pack: 'Hospitality Pack',
     desc: 'Revenue management, guest satisfaction, and operational efficiency at a glance.',
     questions: [
       'What is our RevPAR trend for Q1 vs last year by property?',
@@ -25,6 +27,7 @@ const CASES = [
   {
     emoji: '🚚',
     industry: 'Logistics',
+    pack: 'Logistics Pack',
     desc: 'Real-time visibility into shipments, suppliers, and fulfilment performance.',
     questions: [
       'Which shipments are at risk of missing their delivery window today?',
@@ -35,6 +38,7 @@ const CASES = [
   {
     emoji: '🛍️',
     industry: 'Retail',
+    pack: 'Retail Pack',
     desc: 'Product performance, inventory health, and customer behaviour intelligence.',
     questions: [
       'Which product categories are trending down in the Northeast?',
@@ -45,6 +49,7 @@ const CASES = [
   {
     emoji: '🏦',
     industry: 'Financial Services',
+    pack: 'Finance Pack',
     desc: 'Transaction monitoring, portfolio insights, and regulatory intelligence.',
     questions: [
       'Show me accounts with unusual transaction volume this month.',
@@ -55,6 +60,7 @@ const CASES = [
   {
     emoji: '🏭',
     industry: 'Manufacturing',
+    pack: null,
     desc: 'Production efficiency, downtime analysis, and quality control intelligence.',
     questions: [
       'Which production lines had the most unplanned downtime last quarter?',
@@ -76,7 +82,14 @@ function CaseCard({ c, index }) {
       transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1], delay: (index % 3) * 0.1 }}
       className={`group bg-white border-[1.5px] border-gray-100 rounded-2xl p-6 transition-all duration-200 cursor-default ${c.accent} hover:-translate-y-1 hover:shadow-lg`}
     >
-      <div className="text-3xl mb-4">{c.emoji}</div>
+      <div className="flex items-start justify-between mb-4">
+        <div className="text-3xl">{c.emoji}</div>
+        {c.pack && (
+          <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
+            {c.pack}
+          </span>
+        )}
+      </div>
       <h3 className="text-[17px] font-bold text-gray-900 mb-1.5">{c.industry}</h3>
       <p className="text-[13px] text-gray-500 mb-5 leading-relaxed">{c.desc}</p>
       <div className="space-y-2.5">

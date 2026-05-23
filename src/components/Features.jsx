@@ -3,6 +3,7 @@ import { motion, useInView, AnimatePresence } from 'framer-motion';
 import {
   MessageSquareText, Network, BellRing, CalendarClock,
   Paperclip, Layers, Bot, Table2, BarChart3, FileText,
+  Workflow, Shield, Package,
 } from 'lucide-react';
 
 const FEATURES = [
@@ -13,6 +14,30 @@ const FEATURES = [
     desc: 'Type a question the way you\'d ask a colleague. Zevra translates natural language into precise SQL, queries your live databases, and returns a structured answer with full data tables — in seconds.',
     bullets: ['Live database queries, not cached data', 'Follow-up questions with conversation context', 'Exports to CSV, Excel, PDF, or Markdown'],
     mock: <NLQMock />,
+  },
+  {
+    icon: Workflow,
+    label: 'Multi-step Reasoning',
+    title: 'Investigate like an analyst, not a query.',
+    desc: 'Complex questions require more than one query. Zevra runs a ReAct-style investigation — each step queries real data, evaluates what it found, and decides what to query next. The reasoning trace shows exactly how the answer was built.',
+    bullets: [
+      'Up to 6 adaptive steps — each informed by actual results',
+      'Cross-source joins when the answer spans multiple databases',
+      'Live reasoning trace: every step, SQL, and decision visible',
+    ],
+    mock: <ReasoningMock />,
+  },
+  {
+    icon: Shield,
+    label: 'Advanced Governance',
+    title: 'Enterprise controls, built in.',
+    desc: 'Column masking, row-level security, and data contracts protect sensitive data before it ever reaches the user. Compliance teams get an immutable audit log of every query run — who asked, what SQL ran, and which columns were masked.',
+    bullets: [
+      'Column policies: mask, hash, redact, or exclude PII',
+      'Row-level filters resolved per-user at query time',
+      'Immutable audit log with every query, user, and SQL executed',
+    ],
+    mock: <GovernanceMock />,
   },
   {
     icon: Network,
@@ -48,13 +73,31 @@ const FEATURES = [
   },
   {
     icon: Layers,
-    label: 'Semantic Layer',
-    title: 'Teach Zevra your business vocabulary.',
-    desc: 'Map technical column names to business terms. Define entity relationships, lifecycle stages, and domain vocabulary. The more context you give Zevra, the more precise and relevant its answers become.',
-    bullets: ['Business term mapping', 'Entity lifecycle definitions', 'Domain vocabulary management'],
+    label: 'Semantic Layer & Learning',
+    title: 'A semantic layer that learns.',
+    desc: 'Map technical column names to business terms — and let Zevra build from there. Every successful query is analysed to extract business term definitions. Corrections feed back into future answers. The longer you use Zevra, the more precisely it speaks your language.',
+    bullets: [
+      'Business term and entity mapping',
+      'Auto-learns SQL patterns from every successful query',
+      'Corrections and positive feedback improve future answers',
+    ],
     mock: <SemanticMock />,
   },
+  {
+    icon: Package,
+    label: 'Industry Packs',
+    title: 'Ready to go on day one.',
+    desc: 'Industry packs give every new account a complete semantic layer for their domain — pre-built entities, vocabulary, KPI definitions, and example questions — without any manual configuration. Zevra recommends the right pack automatically after scanning your schema.',
+    bullets: [
+      '5 packs: Healthcare, Hospitality, Logistics, Retail, Finance',
+      'Entities, vocabulary, KPIs, and alert templates pre-configured',
+      'Auto-recommended from your discovered schema on day one',
+    ],
+    mock: <PacksMock />,
+  },
 ];
+
+// ── Mock components ────────────────────────────────────────────────────────────
 
 function NLQMock() {
   return (
@@ -89,6 +132,76 @@ function NLQMock() {
             </table>
           </div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function ReasoningMock() {
+  const steps = [
+    { no: 1, desc: 'Revenue by month — all regions', rows: 12, decision: 'Need more data', note: 'March confirmed −12%', status: 'amber' },
+    { no: 2, desc: 'March breakdown by product category', rows: 8, decision: 'Need more data', note: 'Electronics −34%', status: 'amber' },
+    { no: 3, desc: 'Electronics returns by region in March', rows: 6, decision: 'Sufficient', note: '', status: 'emerald' },
+  ];
+  return (
+    <div className="space-y-2.5">
+      {steps.map((s) => (
+        <div key={s.no} className="flex items-start gap-2.5">
+          <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5 text-[10px] font-black ${
+            s.status === 'emerald' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'
+          }`}>
+            {s.no}
+          </div>
+          <div className="flex-1 min-w-0 bg-white/[0.03] rounded-lg px-2.5 py-2 border border-white/[0.05]">
+            <p className="text-[12px] text-zinc-300 mb-0.5">{s.desc}</p>
+            <div className="flex items-center gap-2 text-[10.5px]">
+              <span className="text-zinc-600">{s.rows} rows</span>
+              <span className={`font-semibold ${s.status === 'emerald' ? 'text-emerald-400' : 'text-amber-400'}`}>
+                → {s.decision}
+              </span>
+              {s.note && <span className="text-zinc-600">({s.note})</span>}
+            </div>
+          </div>
+        </div>
+      ))}
+      <div className="bg-emerald-500/[0.07] border border-emerald-500/20 rounded-lg px-3 py-2.5 mt-1">
+        <p className="text-[12px] text-emerald-300 leading-snug">
+          <strong className="text-emerald-200">March revenue dropped 12%</strong> — driven by a 3× spike in Electronics returns concentrated in the Northeast region.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function GovernanceMock() {
+  const policies = [
+    { col: 'email',        type: 'HASH',     applies: 'All users' },
+    { col: 'phone_number', type: 'PARTIAL',  applies: 'All users' },
+    { col: 'salary',       type: 'EXCLUDE',  applies: 'Non-HR' },
+    { col: 'ssn',          type: 'CONSTANT', applies: 'All users' },
+  ];
+  const typeColors = {
+    HASH:     'text-amber-400 bg-amber-400/10 border-amber-400/20',
+    PARTIAL:  'text-orange-400 bg-orange-400/10 border-orange-400/20',
+    EXCLUDE:  'text-red-400 bg-red-400/10 border-red-400/20',
+    CONSTANT: 'text-zinc-400 bg-white/[0.06] border-white/[0.08]',
+  };
+  return (
+    <div className="space-y-2">
+      <div className="text-[10.5px] text-zinc-600 font-semibold uppercase tracking-wider px-1 mb-1">
+        Column Policies — customers table
+      </div>
+      {policies.map(p => (
+        <div key={p.col} className="flex items-center gap-3 bg-white/[0.03] rounded-lg px-3 py-2 border border-white/[0.05]">
+          <span className="font-mono text-[11.5px] text-zinc-300 flex-1">{p.col}</span>
+          <span className={`text-[9.5px] font-bold px-2 py-0.5 rounded-full border ${typeColors[p.type]}`}>{p.type}</span>
+          <span className="text-[10.5px] text-zinc-600 text-right w-16 shrink-0">{p.applies}</span>
+        </div>
+      ))}
+      <div className="flex items-center gap-2 pt-1 text-[11px] text-zinc-600">
+        <span className="text-emerald-400 font-semibold">4 policies active</span>
+        <span>·</span>
+        <span>All queries logged to audit trail</span>
       </div>
     </div>
   );
@@ -198,29 +311,74 @@ function FileMock() {
 }
 
 function SemanticMock() {
-  const entities = [
-    { name: 'Customer', cols: ['customer_id', 'full_name', 'tier'], mapped: 'Account' },
-    { name: 'trx_ledger', cols: ['trx_id', 'amt', 'ts'], mapped: 'Transaction' },
+  const learned = [
+    { term: 'late shipment', sql: "status = 'DELAYED' AND eta < NOW()", confidence: 91, count: 23 },
+    { term: 'active customer', sql: "last_order_date > NOW() - INTERVAL '90 days'", confidence: 84, count: 11 },
   ];
   return (
     <div className="space-y-3">
-      {entities.map(e => (
-        <div key={e.name} className="bg-white/[0.04] rounded-xl border border-white/[0.07] p-3">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[12px] font-bold text-zinc-300 font-mono">{e.name}</span>
-            <span className="text-[10px] text-emerald-400 font-semibold bg-emerald-400/10 px-2 py-0.5 rounded-full">→ {e.mapped}</span>
+      <div className="text-[10.5px] text-zinc-600 font-semibold uppercase tracking-wider px-0.5">
+        Auto-learned from queries
+      </div>
+      {learned.map(l => (
+        <div key={l.term} className="bg-white/[0.04] rounded-xl border border-white/[0.07] p-3">
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-[12.5px] font-bold text-zinc-200">"{l.term}"</span>
+            <span className="text-[10px] text-zinc-500">used {l.count}×</span>
           </div>
-          <div className="flex flex-wrap gap-1.5">
-            {e.cols.map(c => (
-              <span key={c} className="text-[10.5px] font-mono text-zinc-500 bg-white/[0.04] px-2 py-0.5 rounded">{c}</span>
-            ))}
+          <span className="font-mono text-[10.5px] text-emerald-400/80 break-all leading-relaxed">{l.sql}</span>
+          <div className="mt-2 flex items-center gap-2">
+            <div className="flex-1 h-1 bg-white/[0.06] rounded-full overflow-hidden">
+              <div className="h-full bg-emerald-500/60 rounded-full" style={{ width: `${l.confidence}%` }} />
+            </div>
+            <span className="text-[10px] text-zinc-500 shrink-0">{l.confidence}% confidence</span>
           </div>
         </div>
       ))}
-      <p className="text-[11px] text-zinc-600 text-center">Vocabulary + relationships auto-suggested</p>
+      <p className="text-[11px] text-zinc-600 text-center">Corrections feed back into future answers</p>
     </div>
   );
 }
+
+function PacksMock() {
+  const packs = [
+    { name: 'Healthcare', coverage: 82, entities: 8, vocab: 34, recommended: true },
+    { name: 'Hospitality', coverage: 41, entities: 4, vocab: 18, recommended: false },
+  ];
+  return (
+    <div className="space-y-3">
+      <div className="text-[10.5px] text-zinc-600 font-semibold uppercase tracking-wider px-0.5">
+        Detected from your schema
+      </div>
+      {packs.map(p => (
+        <div key={p.name} className={`rounded-xl border p-3 ${p.recommended ? 'border-emerald-500/30 bg-emerald-500/[0.05]' : 'border-white/[0.07] bg-white/[0.02]'}`}>
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-[13px] font-bold text-zinc-200">{p.name} Pack</span>
+            {p.recommended && (
+              <span className="text-[9.5px] font-bold text-emerald-400 bg-emerald-400/10 border border-emerald-400/20 px-2 py-0.5 rounded-full">
+                Recommended
+              </span>
+            )}
+          </div>
+          <div className="flex items-center gap-2 mb-1.5">
+            <div className="flex-1 h-1.5 bg-white/[0.06] rounded-full overflow-hidden">
+              <div className="h-full bg-emerald-500/70 rounded-full" style={{ width: `${p.coverage}%` }} />
+            </div>
+            <span className="text-[10.5px] text-zinc-500 shrink-0">{p.coverage}% match</span>
+          </div>
+          <div className="flex gap-3 text-[10.5px] text-zinc-600">
+            <span>{p.entities} entities</span>
+            <span>·</span>
+            <span>{p.vocab} vocab terms</span>
+          </div>
+        </div>
+      ))}
+      <p className="text-[11px] text-zinc-600 text-center">Apply in one click — entities and vocab configured instantly</p>
+    </div>
+  );
+}
+
+// ── Features section ───────────────────────────────────────────────────────────
 
 export default function Features() {
   const [active, setActive] = useState(0);

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Bot, Send } from 'lucide-react';
+import { Bot, Send, Shield } from 'lucide-react';
 
 const DEMOS = [
   {
@@ -39,29 +39,37 @@ const DEMOS = [
       ['Airport Stay',  '76%', '$134', { val: '+3%',  up: true  }],
     ],
   },
+  {
+    industry: 'Finance',
+    question: 'List our top customers by lifetime value with their contact details.',
+    answer: 'Top <strong>4 customers</strong> by LTV retrieved. <strong>Email</strong> and <strong>phone</strong> are masked per your column policy — 2 PII columns protected.',
+    headers: ['Customer', 'Email', 'Phone', 'LTV'],
+    governance: true,
+    rows: [
+      ['Apex Corp',    { val: 'a2f9c8d…', masked: true }, { val: '+1-XXX-555-0101', masked: true }, '$284K'],
+      ['Meridian Ltd', { val: 'f8d3a11…', masked: true }, { val: '+1-XXX-555-0188', masked: true }, '$211K'],
+      ['Zenith Group', { val: 'c4e7b02…', masked: true }, { val: '+1-XXX-555-0145', masked: true }, '$178K'],
+      ['Paxon Inc',    { val: '9a2f104…', masked: true }, { val: '+1-XXX-555-0199', masked: true }, '$142K'],
+    ],
+  },
 ];
 
 const TYPE_SPEED = 36;
 
 // ── DemoContent ────────────────────────────────────────────────────────────────
-// Mounted fresh for each demo via key={demoIdx}. Owns all its timers and cleans
-// them up on unmount — prevents stale callbacks leaking into the next demo.
 function DemoContent({ demo, onDone }) {
   const [typedText,   setTypedText]   = useState('');
-  const [phase,       setPhase]       = useState('typing'); // typing|thinking|answer
+  const [phase,       setPhase]       = useState('typing');
   const [visibleRows, setVisibleRows] = useState([]);
   const timers = useRef([]);
 
-  // Register a timeout and track its ID so we can cancel all on unmount.
   const schedule = (fn, delay) => {
     const id = setTimeout(fn, delay);
     timers.current.push(id);
   };
 
-  // Cancel every pending timer when this demo is torn down.
   useEffect(() => () => timers.current.forEach(clearTimeout), []);
 
-  // Typewriter on mount.
   useEffect(() => {
     let i = 0;
     const tick = () => {
@@ -76,17 +84,14 @@ function DemoContent({ demo, onDone }) {
     schedule(tick, 300);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Phase transitions.
   useEffect(() => {
     if (phase === 'thinking') {
       schedule(() => setPhase('answer'), 1600);
     }
     if (phase === 'answer') {
-      // Stagger each row in independently.
       demo.rows.forEach((_, idx) =>
         schedule(() => setVisibleRows(prev => [...prev, idx]), 300 + idx * 150),
       );
-      // After all rows + reading time, tell the parent to advance.
       schedule(onDone, 300 + demo.rows.length * 150 + 3000);
     }
   }, [phase]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -136,9 +141,23 @@ function DemoContent({ demo, onDone }) {
             {phase === 'answer' && (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
                 <p
-                  className="text-[12.5px] text-zinc-300 leading-relaxed mb-3"
+                  className="text-[12.5px] text-zinc-300 leading-relaxed mb-2"
                   dangerouslySetInnerHTML={{ __html: demo.answer }}
                 />
+
+                {/* Governance pill — only shown when demo has masking */}
+                {demo.governance && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.15 }}
+                    className="flex items-center gap-1.5 text-[10.5px] font-semibold text-amber-400 bg-amber-400/10 border border-amber-400/20 px-2.5 py-1 rounded-full w-fit mb-2.5"
+                  >
+                    <Shield size={9} />
+                    2 PII columns masked · column policy active
+                  </motion.div>
+                )}
+
                 <div className="rounded-xl overflow-hidden border border-white/[0.08] text-[11.5px]">
                   <table className="w-full border-collapse">
                     <thead>
@@ -163,9 +182,15 @@ function DemoContent({ demo, onDone }) {
                             {row.map((cell, ci) => (
                               <td key={ci} className="px-3 py-1.5 border-t border-white/[0.05] text-zinc-400">
                                 {typeof cell === 'object' ? (
-                                  <span className={cell.up ? 'text-emerald-400 font-semibold' : 'text-red-400 font-semibold'}>
-                                    {cell.val}
-                                  </span>
+                                  cell.masked ? (
+                                    <span className="font-mono text-[10.5px] text-amber-400/90 tracking-tight bg-amber-400/5 px-1.5 py-0.5 rounded">
+                                      {cell.val}
+                                    </span>
+                                  ) : (
+                                    <span className={cell.up ? 'text-emerald-400 font-semibold' : 'text-red-400 font-semibold'}>
+                                      {cell.val}
+                                    </span>
+                                  )
                                 ) : cell}
                               </td>
                             ))}
@@ -200,21 +225,36 @@ export default function ChatDemo() {
           <div className="w-3 h-3 rounded-full bg-[#28c840]" />
         </div>
         <span className="flex-1 text-center text-[12px] font-medium text-zinc-500">Zevra</span>
-        <AnimatePresence mode="wait">
-          <motion.span
-            key={demo.industry}
-            initial={{ opacity: 0, y: 4 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -4 }}
-            transition={{ duration: 0.2 }}
-            className="text-[10px] font-semibold text-emerald-400 bg-emerald-400/10 border border-emerald-400/20 px-2 py-0.5 rounded-full tracking-wider uppercase"
-          >
-            {demo.industry}
-          </motion.span>
-        </AnimatePresence>
+        <div className="flex items-center gap-1.5">
+          <AnimatePresence mode="wait">
+            <motion.span
+              key={demo.industry}
+              initial={{ opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4 }}
+              transition={{ duration: 0.2 }}
+              className="text-[10px] font-semibold text-emerald-400 bg-emerald-400/10 border border-emerald-400/20 px-2 py-0.5 rounded-full tracking-wider uppercase"
+            >
+              {demo.industry}
+            </motion.span>
+          </AnimatePresence>
+          <AnimatePresence>
+            {demo.governance && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.7 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.7 }}
+                transition={{ duration: 0.2 }}
+                title="Column masking policy active"
+              >
+                <Shield size={12} className="text-amber-400" />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
 
-      {/* Chat body — keyed so React fully remounts DemoContent on every demo change */}
+      {/* Chat body */}
       <AnimatePresence mode="wait">
         <motion.div
           key={demoIdx}
