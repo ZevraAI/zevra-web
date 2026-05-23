@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Zap } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
+import logoSrc from '../assets/logo.png';
 import { APP_URL } from '../lib/config';
 
 const links = [
@@ -49,9 +50,7 @@ export default function Nav() {
         <div className="container-pad w-full flex items-center gap-8">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2.5 shrink-0">
-            <div className="w-8 h-8 rounded-[9px] bg-gradient-to-br from-emerald-brand to-emerald-400 flex items-center justify-center shadow-lg shadow-emerald-900/40">
-              <Zap size={15} className="text-white fill-white" />
-            </div>
+            <img src={logoSrc} alt="Zevra" width={32} height={32} style={{ objectFit: 'cover', borderRadius: '9px' }} />
             <span className="text-[19px] font-black tracking-tight text-white">Zevra</span>
           </Link>
 

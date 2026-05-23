@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { CheckCircle2, Zap, ArrowLeft } from 'lucide-react';
+import { CheckCircle2, ArrowLeft } from 'lucide-react';
+import logoSrc from '../assets/logo.png';
 import Nav from '../components/Nav';
 import Footer from '../components/Footer';
 
@@ -204,9 +205,7 @@ export default function Demo() {
               {/* Proof points */}
               <div className="bg-[#080A0F] rounded-2xl p-6 space-y-3">
                 <div className="flex items-center gap-2 mb-4">
-                  <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-emerald-brand to-emerald-400 flex items-center justify-center">
-                    <Zap size={13} className="text-white fill-white" />
-                  </div>
+                  <img src={logoSrc} alt="Zevra" width={28} height={28} style={{ objectFit: 'cover', borderRadius: '8px' }} />
                   <span className="text-[14px] font-bold text-white">Zevra</span>
                 </div>
                 {PROOF.map((p) => (
